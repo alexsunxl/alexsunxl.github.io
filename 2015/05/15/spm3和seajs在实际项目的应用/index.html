@@ -1,0 +1,336 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>spm3和seajs在实际项目的应用 | 阿乐的javascript研究所</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="阿乐">
+    
+    <meta name="description" content="为什么要这样搭配？在spm3，支持的书写规范从 CMD 模块 转向了 CommonJS。因此在构建之前，要先把原 CMD 模块的 define 包装去掉。这就跟spm2.x时代，spm2＋seajs的紧密配合完全不一样了。既然spm3已经不和seajs配套，为什么我还要用seajs＋spm，我用gu">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="阿乐的javascript研究所" title="阿乐的javascript研究所"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="阿乐的javascript研究所">阿乐的javascript研究所</a></h1>
+				<h2 class="blog-motto">专注前端挖坑</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:sinle.me">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/05/15/spm3和seajs在实际项目的应用/" title="spm3和seajs在实际项目的应用" itemprop="url">spm3和seajs在实际项目的应用</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://sinle.me" title="阿乐">阿乐</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-05-15T02:22:11.000Z" itemprop="datePublished">2015-05-15</time>
+    更新日期:<time datetime="2015-05-15T04:14:04.000Z" itemprop="dateModified">2015-05-15</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么要这样搭配？"><span class="toc-number">1.</span> <span class="toc-text">为什么要这样搭配？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#具体实现"><span class="toc-number">2.</span> <span class="toc-text">具体实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#参考"><span class="toc-number">2.1.</span> <span class="toc-text">参考</span></a></li></ol></li></ol>
+		</div>
+		
+		<h2 id="为什么要这样搭配？">为什么要这样搭配？</h2><p>在spm3，支持的书写规范从 CMD 模块 转向了 CommonJS。因此在构建之前，要先把原 CMD 模块的 define 包装去掉。<br>这就跟spm2.x时代，spm2＋seajs的紧密配合完全不一样了。<br>既然spm3已经不和seajs配套，为什么我还要用seajs＋spm，我用gulp或者grunt不是更方便吗。</p>
+<p>答案就是为了能够在无论是开发环境还是测试环境，每一个页面都只能有一个单一的js文件，也就是页面的脚本入口文件。</p>
+<h2 id="具体实现">具体实现</h2><p>以php为例，在每个页面的页脚都include这个php文件:</p>
+<p>registerJsFile.php</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$route //动态生成，对应页面的路由,比如当前页index.php,$route = 'index.js';</span><br><span class="line">echo '<span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"path/to/sea.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>';</span><br><span class="line">if( 开发环境 )&#123;</span><br><span class="line">    //seajs-wrap,能够让sea.js 加载 commonJs规范的js文件 的一个插件</span><br><span class="line">    echo '<span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"path/to/seajs-wrap.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>';</span><br><span class="line">    echo '<span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"js-dev/static/'.$route.'"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>';</span><br><span class="line">&#125;else&#123;</span><br><span class="line">    //生产环境的代码已经通过spm完成合并，只要加载入口文件的js就可以了。</span><br><span class="line">    echo '<span class="tag">&lt;<span class="title">script</span>&gt;</span><span class="bash"> src=<span class="string">"/static/'.<span class="variable">$route</span>.'"</span>&gt;</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>';</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来是spm的配置文档 package.json ，这也是很多文章说的不够详细的地方<br>我自己并没有把js单独放在一个子域名下。所以文件夹的位置需要好好的组织。</p>
+<p>开发环境的js，放在 <a href="http://localhost/js-dev/static/" target="_blank" rel="external">http://localhost/js-dev/static/</a> 下，<br>spm的package.json放在<a href="http://localhost/js-dev/" target="_blank" rel="external">http://localhost/js-dev/</a> 下。</p>
+<p>package.json</p>
+<figure class="highlight clojure"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="collection">&#123;</span><br><span class="line">    name:'',</span><br><span class="line">    <span class="string">"spm"</span>: <span class="collection">&#123;</span><br><span class="line">        <span class="string">"dependencies"</span>: <span class="collection">&#123;</span><br><span class="line">            <span class="string">"jquery"</span>: <span class="string">"1.8.3"</span>,</span><br><span class="line">            <span class="string">"test"</span>: <span class="string">"1.0.1"</span>,</span><br><span class="line">        &#125;</span>,</span><br><span class="line">        <span class="string">"devDependencies"</span>: <span class="collection">&#123;</span><br><span class="line">            <span class="string">"expect.js"</span>: <span class="string">"0.3.1"</span></span><br><span class="line">        &#125;</span>,</span><br><span class="line">        <span class="string">"output"</span>: <span class="collection">[</span><br><span class="line">            <span class="string">"static/index.js"</span>,</span><br><span class="line">            <span class="string">"static/user.js"</span>,</span><br><span class="line">            <span class="string">"static/login.js"</span>,</span><br><span class="line">            <span class="string">"static/product/list.js"</span>,</span><br><span class="line">        ]</span>,</span><br><span class="line">        /** dest定义输出的目录，../是输出在开发代码的上一层 **/</span><br><span class="line">        <span class="string">"dest"</span>: <span class="string">"../"</span></span><br><span class="line">    &#125;</span>,</span><br><span class="line">    <span class="string">"devDependencies"</span>: <span class="collection">&#123;</span><br><span class="line">        <span class="string">"spm"</span>: <span class="string">"3"</span></span><br><span class="line">    &#125;</span>,</span><br><span class="line">    <span class="string">"scripts"</span>: <span class="collection">&#123;</span><br><span class="line">        <span class="string">"test"</span>: <span class="string">"spm test"</span>,</span><br><span class="line">        <span class="string">"build"</span>: <span class="string">"spm build"</span></span><br><span class="line">    &#125;</span></span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>output的值是数组，那么spm build就会生成对应的多个文件。<br>例如:</p>
+<p><a href="http://localhost/js-dev/static/index.js" target="_blank" rel="external">http://localhost/js-dev/static/index.js</a><br><figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="reserved">var</span> component = <span class="built_in">require</span>(<span class="string">'./component'</span>);</span><br><span class="line"><span class="built_in">console</span>.log(component.a);</span><br></pre></td></tr></table></figure></p>
+<p><a href="http://localhost/js-dev/static/component.js" target="_blank" rel="external">http://localhost/js-dev/static/component.js</a><br><figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">module.exports.<span class="literal">a</span> = <span class="number">10</span><span class="comment">;</span></span><br></pre></td></tr></table></figure></p>
+<p>最终生成出来两个文件 <a href="http://localhost/static/index.js" target="_blank" rel="external">http://localhost/static/index.js</a> 和 <a href="http://localhost/static/index.js" target="_blank" rel="external">http://localhost/static/index.js</a><br><figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">define<span class="list">(<span class="string">"/static/index"</span>,[],function<span class="list">(<span class="keyword">n</span>)</span>&#123;var <span class="literal">t</span>=n<span class="list">(<span class="string">"/static/component"</span>)</span><span class="comment">;console.log(t.a)&#125;),</span></span><br><span class="line">define<span class="list">(<span class="string">"/static/component"</span>,[],function<span class="list">(<span class="keyword">n</span>,<span class="literal">t</span>,o)</span>&#123;o.exports.a=10&#125;)</span><span class="comment">;</span></span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">define(<span class="string">"/static/index-debug"</span>, [], <span class="reserved">function</span>(<span class="built_in">require</span>, exports, <span class="built_in">module</span>)&#123;</span><br><span class="line">    <span class="reserved">var</span> component = <span class="built_in">require</span>(<span class="string">"/static/component-debug"</span>);</span><br><span class="line">    <span class="built_in">console</span>.log(component.a);</span><br><span class="line">&#125;);</span><br><span class="line">define(<span class="string">"/static/component-debug"</span>, [], <span class="reserved">function</span>(<span class="built_in">require</span>, exports, <span class="built_in">module</span>)&#123;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">module</span>.exports.a = <span class="number">10</span>;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>如果你已经配置好，生产环境的代码就能够根据自己route， 直接引用属于自己的入口脚本了～</p>
+<p>当然这种用法只是实际项目中，我自己的实践过程，如果有什么不足，或者更好的改进办法，欢迎指出。</p>
+<h3 id="参考">参考</h3><blockquote>
+<p><a href="http://qianduanblog.com/post/js-learning-42-using-spm-3-build-seajs-project.html" title="Title" target="_blank" rel="external">使用spm@3构建seajs项目</a><br><a href="http://xbingoz.com/494.html" title="Title" target="_blank" rel="external">sea.js在实际项目中的一些应用思路</a><br><a href="http://acwong.org/2014/11/16/2048-with-seajs-and-spm3/" title="Title" target="_blank" rel="external">Seajs 实践(二)—— 使用 spm3 构建项目</a><br><a href="http://spmjs.io/documentation/package.json" title="Title" target="_blank" rel="external">Package.json</a></p>
+</blockquote>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/spm3-0-seajs-模块化/">spm3.0  seajs  模块化</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://sinle.me/2015/05/15/spm3和seajs在实际项目的应用/" data-title="spm3和seajs在实际项目的应用 | 阿乐的javascript研究所" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/05/07/Hello-World！开始挖坑啦～/"  title="Hello World！开始挖坑啦～">
+ <strong>NEXT:</strong><br/> 
+ <span>Hello World！开始挖坑啦～
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comment">
+
+    <h1 class="title">文章评论</h1>
+
+    <!-- 多说评论框 start -->
+    <div class="ds-thread" data-thread-key="2015/05/15/spm3和seajs在实际项目的应用/" data-title="spm3和seajs在实际项目的应用" data-url="http://sinle.me/2015/05/15/spm3和seajs在实际项目的应用/"></div>
+    <!-- 多说评论框 end -->
+
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:"sinle"};
+        (function() {
+            var ds = document.createElement('script');
+            ds.type = 'text/javascript';ds.async = true;
+            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+            ds.charset = 'UTF-8';
+            (document.getElementsByTagName('head')[0] 
+             || document.getElementsByTagName('body')[0]).appendChild(ds);
+        })();
+        </script>
+    <!-- 多说公共JS代码 end -->
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么要这样搭配？"><span class="toc-number">1.</span> <span class="toc-text">为什么要这样搭配？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#具体实现"><span class="toc-number">2.</span> <span class="toc-text">具体实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#参考"><span class="toc-number">2.1.</span> <span class="toc-text">参考</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/spm3-0-seajs-模块化/" title="spm3.0  seajs  模块化">spm3.0  seajs  模块化<sup>1</sup></a></li>
+		
+			<li><a href="/tags/随便写写/" title="随便写写">随便写写<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://sinle.me" target="_blank" title="阿乐">阿乐</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>
