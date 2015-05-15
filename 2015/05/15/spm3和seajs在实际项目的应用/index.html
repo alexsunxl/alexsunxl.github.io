@@ -73,7 +73,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-05-15T02:22:11.000Z" itemprop="datePublished">2015-05-15</time>
-    更新日期:<time datetime="2015-05-15T04:14:04.000Z" itemprop="dateModified">2015-05-15</time>
+    更新日期:<time datetime="2015-05-15T04:27:36.000Z" itemprop="dateModified">2015-05-15</time>
     
   </p>
 </header>
@@ -86,7 +86,7 @@
 		</div>
 		
 		<h2 id="为什么要这样搭配？">为什么要这样搭配？</h2><p>在spm3，支持的书写规范从 CMD 模块 转向了 CommonJS。因此在构建之前，要先把原 CMD 模块的 define 包装去掉。<br>这就跟spm2.x时代，spm2＋seajs的紧密配合完全不一样了。<br>既然spm3已经不和seajs配套，为什么我还要用seajs＋spm，我用gulp或者grunt不是更方便吗。</p>
-<p>答案就是为了能够在无论是开发环境还是测试环境，每一个页面都只能有一个单一的js文件，也就是页面的脚本入口文件。</p>
+<p>答案就是为了能够在无论是开发环境还是生产环境（线上），每一个页面都只能有一个单一的js文件，也就是页面的脚本入口文件。</p>
 <h2 id="具体实现">具体实现</h2><p>以php为例，在每个页面的页脚都include这个php文件:</p>
 <p>registerJsFile.php</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$route //动态生成，对应页面的路由,比如当前页index.php,$route = 'index.js';</span><br><span class="line">echo '<span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"path/to/sea.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>';</span><br><span class="line">if( 开发环境 )&#123;</span><br><span class="line">    //seajs-wrap,能够让sea.js 加载 commonJs规范的js文件 的一个插件</span><br><span class="line">    echo '<span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"path/to/seajs-wrap.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>';</span><br><span class="line">    echo '<span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"js-dev/static/'.$route.'"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>';</span><br><span class="line">&#125;else&#123;</span><br><span class="line">    //生产环境的代码已经通过spm完成合并，只要加载入口文件的js就可以了。</span><br><span class="line">    echo '<span class="tag">&lt;<span class="title">script</span>&gt;</span><span class="bash"> src=<span class="string">"/static/'.<span class="variable">$route</span>.'"</span>&gt;</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>';</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
