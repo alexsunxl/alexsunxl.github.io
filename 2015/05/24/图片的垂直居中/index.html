@@ -1,0 +1,358 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>图片的垂直居中 | 阿乐的javascript研究所</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="阿乐">
+    
+    <meta name="description" content="这是一种兼容性很好，结构简单的垂直居中。结论党想直接看代码可以点击这里。
+原理inline-block元素可以设置vertical-align属性。并且可以和block元素一样设置宽高，但又具有inline元素不换行的特性。
+简单的来说，就是行内的块元素。
+关于inline-block更详细的原理，">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="阿乐的javascript研究所" title="阿乐的javascript研究所"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="阿乐的javascript研究所">阿乐的javascript研究所</a></h1>
+				<h2 class="blog-motto">专注前端挖坑</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:sinle.me">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/05/24/图片的垂直居中/" title="图片的垂直居中" itemprop="url">图片的垂直居中</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://sinle.me" title="阿乐">阿乐</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-05-24T11:13:39.000Z" itemprop="datePublished">2015-05-24</time>
+    更新日期:<time datetime="2015-05-24T13:09:20.000Z" itemprop="dateModified">2015-05-24</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#原理"><span class="toc-number">1.</span> <span class="toc-text">原理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#一步步实现效果"><span class="toc-number">2.</span> <span class="toc-text">一步步实现效果</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#图片和外框"><span class="toc-number">2.1.</span> <span class="toc-text">图片和外框</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#垂直效果"><span class="toc-number">2.2.</span> <span class="toc-text">垂直效果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#居中及其他"><span class="toc-number">2.3.</span> <span class="toc-text">居中及其他</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#缺点"><span class="toc-number">2.4.</span> <span class="toc-text">缺点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#最后放上完整的代码"><span class="toc-number">3.</span> <span class="toc-text">最后放上完整的代码</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#参考"><span class="toc-number">4.</span> <span class="toc-text">参考</span></a></li></ol>
+		</div>
+		
+		<p>这是一种兼容性很好，结构简单的垂直居中。结论党想直接看代码可以<a href="#conclusion">点击</a>这里。</p>
+<h1 id="原理">原理</h1><p>inline-block元素可以设置vertical-align属性。并且可以和block元素一样设置宽高，但又具有inline元素不换行的特性。</p>
+<p>简单的来说，就是行内的块元素。</p>
+<p>关于inline-block更详细的原理，可以点击 <a href="http://ued.taobao.org/blog/2012/08/inline-block/" title="inline-block 前世今生" target="_blank" rel="external">这里</a>了解更多。</p>
+<h1 id="一步步实现效果">一步步实现效果</h1><h2 id="图片和外框">图片和外框</h2><p>首先有一个固定宽高的外框,里面是一张200*200的图片</p>
+<p>css</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class">.img_center</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">width</span>:<span class="value"><span class="number">300px</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">height</span>:<span class="value"><span class="number">300px</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">border</span>:<span class="value"><span class="number">1px</span> solid <span class="hexcolor">#ccc</span></span></span>;</span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>html</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;<span class="tag">div</span> class=<span class="string">"img_center"</span>&gt;</span><br><span class="line">	&lt;<span class="tag">img</span> src=<span class="string">"path/to/xx.img"</span> alt=<span class="string">"img"</span>/&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+<p>效果</p>
+<p><img src="http://7xj9do.com1.z0.glb.clouddn.com/blog_example_1.jpg
+"></p>
+<h2 id="垂直效果">垂直效果</h2><p>接下来首先是要实现图片的垂直效果,然后一个inline-block元素并没有任何意义。所以现在需要添加一个辅助的inline-block</p>
+<p>css</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class">.img_center</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">width</span>:<span class="value"><span class="number">300px</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">height</span>:<span class="value"><span class="number">300px</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">border</span>:<span class="value"><span class="number">1px</span> solid <span class="hexcolor">#ccc</span></span></span>;</span><br><span class="line">&#125;</span>	</span><br><span class="line"><span class="class">.img_center_before</span>, <span class="rule"><span class="attribute">.img_center</span>:<span class="value">before&#123;</span><br><span class="line">	content:<span class="string">" "</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">display</span>:<span class="value">inline-block</span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">height</span>:<span class="value"><span class="number">100%</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">vertical-align</span>:<span class="value"> middle</span></span>;		</span><br><span class="line">	<span class="rule"><span class="attribute">width</span>:<span class="value"><span class="number">2px</span></span></span>; 					<span class="comment">/*	设置宽度是为了效果更直观*/</span></span><br><span class="line">	<span class="rule"><span class="attribute">background-color</span>:<span class="value"> red</span></span>;		<span class="comment">/*	设置背景色是为了效果更直观*/</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="class">.img_center</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">max-width</span>:<span class="value"><span class="number">100%</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">max-height</span>:<span class="value"><span class="number">100%</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">vertical-align</span>:<span class="value"> middle</span></span>;	</span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>html</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"img_center"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"img_center_before"</span>&gt;</span><span class="tag">&lt;/<span class="title">div</span>&gt;</span> <span class="comment">&lt;!-- ie低版本不支持伪元素 --&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">img</span> <span class="attribute">src</span>=<span class="value">"path/to/xx.img"</span> <span class="attribute">alt</span>=<span class="value">"img"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>效果如下<br><img src="http://7xj9do.com1.z0.glb.clouddn.com/blog_example_2.jpg"></p>
+<h2 id="居中及其他">居中及其他</h2><p>垂直搞定了，那居中怎么办？很简单，在.img_center中增加text-align: center即可</p>
+<p>等等，两个inline-block中间的间隙是什么鬼？</p>
+<p>这个是浏览器渲染了空白符号，去掉的方法有很多。在这里我推荐使用最简单的：只要在.img_center中添加一行”font-size:0px”即可。</p>
+<p>最后来只要把 .img_center_before中的width和background-color删去就ok了。</p>
+<p>最终的效果:<br><img src="http://7xj9do.com1.z0.glb.clouddn.com/blog_example_3.jpg"></p>
+<p>用这种方法，图片可以是任何比例的矩形，也不需要限制大小（可以大于外框）。</p>
+<h2 id="缺点">缺点</h2><p>1，外框的高度是必须要固定的。 （一下篇讲会说到在响应式中要如何处理，届时将会详细描述，外框的宽度按照屏幕宽度的百分比，高度和宽度相等的情况下要如何处理）</p>
+<p>就目前而言我自己知道的缺点只有这一个，如果你发现了新的问题，欢迎提出来，我再想办法改进～</p>
+<div id="conclusion"></div>
+
+<h1 id="最后放上完整的代码">最后放上完整的代码</h1><p>css</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class">.img_center</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">300px</span></span></span>;				<span class="comment">/** @todo */</span></span><br><span class="line">	<span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">300px</span></span></span>;				<span class="comment">/** @todo */</span></span><br><span class="line">	<span class="rule"><span class="attribute">border</span>:<span class="value"> <span class="number">1px</span> <span class="hexcolor">#ccc</span> solid</span></span>;		<span class="comment">/** @todo */</span></span><br><span class="line">	<span class="rule"><span class="attribute">text-align</span>:<span class="value"> center</span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">font-size</span>:<span class="value"> <span class="number">0px</span></span></span>;</span><br><span class="line">&#125;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class">.img_center_before</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">content</span>:<span class="value"> <span class="string">" "</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">display</span>:<span class="value"> inline-block</span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">vertical-align</span>:<span class="value"> middle</span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">100%</span></span></span>;</span><br><span class="line">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="class">.img_center</span> <span class="tag">img</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">max-width</span>:<span class="value"><span class="number">100%</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">max-height</span>:<span class="value"><span class="number">100%</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">vertical-align</span>:<span class="value"> middle</span></span>;</span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>html</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"img_center"</span>&gt;</span><br><span class="line">	&lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"img_center_before"</span>&gt;&lt;/<span class="keyword">div</span>&gt;</span><br><span class="line">	&lt;img src=<span class="string">"path/to/image"</span> /&gt;</span><br><span class="line">&lt;/<span class="keyword">div</span>&gt;</span><br></pre></td></tr></table></figure>
+<h1 id="参考">参考</h1><blockquote>
+<p><a href="http://ued.taobao.org/blog/2012/08/inline-block/" title="inline-block 前世今生" target="_blank" rel="external">inline-block 前世今生</a></p>
+<p><a href="http://stackoverflow.com/questions/7273338/how-to-vertically-align-an-image-inside-div" title="How to vertically align an image inside div" target="_blank" rel="external">How to vertically align an image inside div</a><br>（最高票的答案）</p>
+</blockquote>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/垂直居中-html-css/">垂直居中 html+css</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://sinle.me/2015/05/24/图片的垂直居中/" data-title="图片的垂直居中 | 阿乐的javascript研究所" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/05/15/spm3和seajs在实际项目的应用/"  title="spm3和seajs在实际项目的应用">
+ <strong>NEXT:</strong><br/> 
+ <span>spm3和seajs在实际项目的应用
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comment">
+
+    <h1 class="title">文章评论</h1>
+
+    <!-- 多说评论框 start -->
+    <div class="ds-thread" data-thread-key="2015/05/24/图片的垂直居中/" data-title="图片的垂直居中" data-url="http://sinle.me/2015/05/24/图片的垂直居中/"></div>
+    <!-- 多说评论框 end -->
+
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:"sinle"};
+        (function() {
+            var ds = document.createElement('script');
+            ds.type = 'text/javascript';ds.async = true;
+            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+            ds.charset = 'UTF-8';
+            (document.getElementsByTagName('head')[0] 
+             || document.getElementsByTagName('body')[0]).appendChild(ds);
+        })();
+        </script>
+    <!-- 多说公共JS代码 end -->
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#原理"><span class="toc-number">1.</span> <span class="toc-text">原理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#一步步实现效果"><span class="toc-number">2.</span> <span class="toc-text">一步步实现效果</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#图片和外框"><span class="toc-number">2.1.</span> <span class="toc-text">图片和外框</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#垂直效果"><span class="toc-number">2.2.</span> <span class="toc-text">垂直效果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#居中及其他"><span class="toc-number">2.3.</span> <span class="toc-text">居中及其他</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#缺点"><span class="toc-number">2.4.</span> <span class="toc-text">缺点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#最后放上完整的代码"><span class="toc-number">3.</span> <span class="toc-text">最后放上完整的代码</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#参考"><span class="toc-number">4.</span> <span class="toc-text">参考</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/spm3-0-seajs-模块化/" title="spm3.0  seajs  模块化">spm3.0  seajs  模块化<sup>1</sup></a></li>
+		
+			<li><a href="/tags/垂直居中-html-css/" title="垂直居中 html+css">垂直居中 html+css<sup>1</sup></a></li>
+		
+			<li><a href="/tags/随便写写/" title="随便写写">随便写写<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://sinle.me" target="_blank" title="阿乐">阿乐</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>
