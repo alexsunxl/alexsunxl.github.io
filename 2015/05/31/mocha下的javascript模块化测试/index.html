@@ -1,0 +1,358 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>mocha下的javascript模块化测试 | 阿乐的javascript研究所</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="阿乐">
+    
+    <meta name="description" content="模块化测试，也是单元测试的意思。
+单元测试是一种测试你的项目中每个最小单元代码的艺术，是使你的程序思路清晰的基础。
+所有的单元都能通过测试，意味着部分（单元）组合而成的整体也能良好的运行，因为这些单元的行为已经被独立的验证过。
+为什么javascript需要做单元测试 传统的javascirpt,即">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="阿乐的javascript研究所" title="阿乐的javascript研究所"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="阿乐的javascript研究所">阿乐的javascript研究所</a></h1>
+				<h2 class="blog-motto">专注前端挖坑</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:sinle.me">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/05/31/mocha下的javascript模块化测试/" title="mocha下的javascript模块化测试" itemprop="url">mocha下的javascript模块化测试</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://sinle.me" title="阿乐">阿乐</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-05-31T04:29:52.000Z" itemprop="datePublished">2015-05-31</time>
+    更新日期:<time datetime="2015-05-31T06:05:36.000Z" itemprop="dateModified">2015-05-31</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么javascript需要做单元测试"><span class="toc-number">1.</span> <span class="toc-text">为什么javascript需要做单元测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#需要的工具"><span class="toc-number">2.</span> <span class="toc-text">需要的工具</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编写模块化测试"><span class="toc-number">3.</span> <span class="toc-text">编写模块化测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#一个简单的例子"><span class="toc-number">3.1.</span> <span class="toc-text">一个简单的例子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#接下来再写一些别的断言"><span class="toc-number">3.2.</span> <span class="toc-text">接下来再写一些别的断言</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#end"><span class="toc-number">4.</span> <span class="toc-text">end</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">5.</span> <span class="toc-text">参考</span></a></li></ol>
+		</div>
+		
+		<p>模块化测试，也是单元测试的意思。</p>
+<p>单元测试是一种测试你的项目中每个最小单元代码的艺术，是使你的程序思路清晰的基础。</p>
+<p>所有的单元都能通过测试，意味着部分（单元）组合而成的整体也能良好的运行，因为这些单元的行为已经被独立的验证过。</p>
+<h2 id="为什么javascript需要做单元测试">为什么javascript需要做单元测试</h2><p> 传统的javascirpt,即jquery＋jq插件再加上一堆混乱的代码，虽然这样也可以做出很多很实在很酷的效果，但是非常维护而且也很难做到自动化的测试。</p>
+<p> 新的标准不断的普及，旧的那一套会慢慢被淘汰，模块化和加载模块在javascript来说是越来越流行了。<br> <br><br> <br></p>
+<p> 做单元测试能让你去更好的划分模块的功能和粒度，也就是说，单元测试能够规范你的javascript模块化。</p>
+<p> 另一方面，javascript是脚本语言，缺乏很多基本的静态检查代码的能力，单元测试能作为一个很好的补充。</p>
+<p> 除此之外写单元测试还有很多优点：代码更有条理，易于维护，保证质量，便于梳理思路。</p>
+<h2 id="需要的工具">需要的工具</h2><p>这种测试方式是机遇node的，所以需要先安装node，已经node的包管理工具 npm。<br>如果你的电脑上还没装过，<br>点击<a href="https://nodejs.org/download/" target="_blank">这里</a>查看详细的安装指引</p>
+<p>有了node和npm之后，接下来就是安装mocha和expect。<br>mocha是一个javascipt的测试框架；expect是帮你封装测试api，给你提供更简便，更语义化的api。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#mocha 需要全局安装</span></span><br><span class="line">npm <span class="keyword">install</span> -g mocha</span><br><span class="line"></span><br><span class="line"><span class="comment">#expect 安装在当前文件夹环境就可以了</span></span><br><span class="line">npm <span class="keyword">install</span> expect</span><br></pre></td></tr></table></figure>
+<p>在当前目录下创建被测试的模块，Module.js。然后创建test文件夹，test文件夹下面，创建测试模块的程序,module.js。</p>
+<p>文件夹的结构如下</p>
+<p><img src="http://7xj9do.com1.z0.glb.clouddn.com/blog-20150531-1.jpg"></p>
+<h2 id="编写模块化测试">编写模块化测试</h2><h3 id="一个简单的例子">一个简单的例子</h3><p>首先是 被测试的模块文件<br>Module.js</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="javascript">(<span class="function"><span class="keyword">function</span> <span class="params">(root, factory)</span></span><br><span class="line"></span>&#123;</span><br><span class="line"><span class="pi">    'use strict'</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span><br><span class="line">    *	让模块支持多种加载规范</span><br><span class="line">    */</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> exports === <span class="string">'object'</span>) &#123;</span><br><span class="line">    </span><br><span class="line">        <span class="comment">// CommonJS module</span></span><br><span class="line">        <span class="built_in">module</span>.exports = factory();</span><br><span class="line">        </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">typeof</span> define === <span class="string">'function'</span> &amp;&amp; define.amd) &#123;</span><br><span class="line">    </span><br><span class="line">        <span class="comment">// AMD. Register as an anonymous module.</span></span><br><span class="line">        define(<span class="function"><span class="keyword">function</span> <span class="params">(req)</span></span><br><span class="line">        </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> factory();</span><br><span class="line">        &#125;);</span><br><span class="line">        </span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    </span><br><span class="line">        root.Module = factory();</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;(<span class="keyword">this</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span></span><br><span class="line"></span>&#123;</span><br><span class="line"><span class="pi">	'use strict'</span>;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//模块的具体代码</span></span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">Module</span><span class="params">()</span></span>&#123;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> Module;</span><br><span class="line"></span><br><span class="line">&#125;));</span></span><br></pre></td></tr></table></figure>
+<p>自动化测试的代码</p>
+<p>test/module.js</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> </span><br><span class="line">	Module = <span class="built_in">require</span>(<span class="string">'../Module'</span>),</span><br><span class="line">	expect  = <span class="built_in">require</span>(<span class="string">'expect'</span>);</span><br><span class="line"></span><br><span class="line">describe(<span class="string">'这个Module模块'</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span></span><br><span class="line"></span>&#123;</span><br><span class="line"><span class="pi">    'use strict'</span>;</span><br><span class="line"></span><br><span class="line">	it(<span class="string">'可以支持 CommonJs的加载规范 '</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span></span><br><span class="line">	</span>&#123;</span><br><span class="line">		expect(Module).toBeA(<span class="string">'function'</span>);</span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'是一个类，能够创建实例对象 '</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span></span><br><span class="line">    </span>&#123;   </span><br><span class="line">        expect(<span class="keyword">new</span> Module).toBeA(Module);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>然后命令行里，当前目录下执行 mocha 命令</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mocha</span><br></pre></td></tr></table></figure>
+<p>效果如下图所示 </p>
+<p><img src="http://7xj9do.com1.z0.glb.clouddn.com/blog-20150531-2.jpg"></p>
+<p>两个测试都能够通过了</p>
+<h3 id="接下来再写一些别的断言">接下来再写一些别的断言</h3><p>修改Module.js 里的内容</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span> <span class="params">(root, factory)</span></span><br><span class="line"></span>&#123;</span><br><span class="line"><span class="pi">    'use strict'</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span><br><span class="line">    *	让模块支持多种加载规范</span><br><span class="line">    */</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> exports === <span class="string">'object'</span>) &#123;</span><br><span class="line">    </span><br><span class="line">        <span class="comment">// CommonJS module</span></span><br><span class="line">        <span class="built_in">module</span>.exports = factory();</span><br><span class="line">        </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">typeof</span> define === <span class="string">'function'</span> &amp;&amp; define.amd) &#123;</span><br><span class="line">    </span><br><span class="line">        <span class="comment">// AMD. Register as an anonymous module.</span></span><br><span class="line">        define(<span class="function"><span class="keyword">function</span> <span class="params">(req)</span></span><br><span class="line">        </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> factory();</span><br><span class="line">        &#125;);</span><br><span class="line">        </span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    </span><br><span class="line">        root.Module = factory();</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;(<span class="keyword">this</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span></span><br><span class="line"></span>&#123;</span><br><span class="line"><span class="pi">	'use strict'</span>;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//模块的具体代码</span></span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">Module</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.number = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">this</span>.bool = <span class="string">"a"</span>;</span><br><span class="line">        <span class="keyword">this</span>.string = <span class="literal">true</span>; </span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> Module;</span><br><span class="line"></span><br><span class="line">&#125;));</span><br></pre></td></tr></table></figure>
+<p>接下来是测试程序</p>
+<p>test/module.js</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> Module = <span class="built_in">require</span>(<span class="string">'../Module'</span>),</span><br><span class="line">	expect  = <span class="built_in">require</span>(<span class="string">'expect'</span>);</span><br><span class="line"></span><br><span class="line">describe(<span class="string">'这个Module模块'</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span></span><br><span class="line"></span>&#123;</span><br><span class="line"><span class="pi">    'use strict'</span>;</span><br><span class="line"></span><br><span class="line">	it(<span class="string">'可以支持 CommonJs的加载规范 '</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span></span><br><span class="line">	</span>&#123;</span><br><span class="line">		expect(Module).toBeA(<span class="string">'function'</span>);</span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'是一个类，能够创建实例对象 '</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        expect(<span class="keyword">new</span> Module).toBeA(Module);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    it(<span class="string">'类的属性 number 是一个数字'</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> <span class="built_in">module</span> = <span class="keyword">new</span> Module;</span><br><span class="line">        expect(<span class="built_in">module</span>.number).toBeA(<span class="string">'number'</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'类的属性 bool 是一个布尔值'</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> <span class="built_in">module</span> = <span class="keyword">new</span> Module;</span><br><span class="line">        expect(<span class="built_in">module</span>.bool).toBeA(<span class="string">'boolean'</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'类的属性 string 是一个字符串'</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> <span class="built_in">module</span> = <span class="keyword">new</span> Module;</span><br><span class="line">        expect(<span class="built_in">module</span>.string).toBeA(<span class="string">'string'</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>执行mocha命令,结果如下图所示:</p>
+<p><img src="http://7xj9do.com1.z0.glb.clouddn.com/blog-20150531-3.jpg"></p>
+<p>很明显，这里有两个不通过的地方，因为this.bool是一个字符串并不是布尔值。同样地，this.string是一个布尔值而不是所期望的字符串。</p>
+<h2 id="end">end</h2><p>上面的例子只是简单的介绍了基于node，mocha,expect等工具下的自动化模块测试。<br>但其实测试是一个很广泛而复杂的领域，我也只是昨天才研究的javascript模块化测试。如果你看到这篇文章哪里有什么问题，或者你有最佳实践方式，欢迎你告诉我～</p>
+<h2 id="参考">参考</h2><p><a href="http://webapplog.com/test-driven-development-in-node-js-with-mocha/" target="_blank" rel="external">Test-Driven Development in Node.js With Mocha</a><br><br><a href="https://cnodejs.org/topic/516526766d38277306c7d277" target="_blank" rel="external">初识 mocha in NodeJS</a></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/模块化测试/">模块化测试</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://sinle.me/2015/05/31/mocha下的javascript模块化测试/" data-title="mocha下的javascript模块化测试 | 阿乐的javascript研究所" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/05/24/图片的垂直居中/"  title="图片的垂直居中">
+ <strong>NEXT:</strong><br/> 
+ <span>图片的垂直居中
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comment">
+
+    <h1 class="title">文章评论</h1>
+
+    <!-- 多说评论框 start -->
+    <div class="ds-thread" data-thread-key="2015/05/31/mocha下的javascript模块化测试/" data-title="mocha下的javascript模块化测试" data-url="http://sinle.me/2015/05/31/mocha下的javascript模块化测试/"></div>
+    <!-- 多说评论框 end -->
+
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:"sinle"};
+        (function() {
+            var ds = document.createElement('script');
+            ds.type = 'text/javascript';ds.async = true;
+            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+            ds.charset = 'UTF-8';
+            (document.getElementsByTagName('head')[0] 
+             || document.getElementsByTagName('body')[0]).appendChild(ds);
+        })();
+        </script>
+    <!-- 多说公共JS代码 end -->
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么javascript需要做单元测试"><span class="toc-number">1.</span> <span class="toc-text">为什么javascript需要做单元测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#需要的工具"><span class="toc-number">2.</span> <span class="toc-text">需要的工具</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编写模块化测试"><span class="toc-number">3.</span> <span class="toc-text">编写模块化测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#一个简单的例子"><span class="toc-number">3.1.</span> <span class="toc-text">一个简单的例子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#接下来再写一些别的断言"><span class="toc-number">3.2.</span> <span class="toc-text">接下来再写一些别的断言</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#end"><span class="toc-number">4.</span> <span class="toc-text">end</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-number">5.</span> <span class="toc-text">参考</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/spm3-0-seajs-模块化/" title="spm3.0  seajs  模块化">spm3.0  seajs  模块化<sup>1</sup></a></li>
+		
+			<li><a href="/tags/垂直居中-html-css/" title="垂直居中 html+css">垂直居中 html+css<sup>1</sup></a></li>
+		
+			<li><a href="/tags/模块化测试/" title="模块化测试">模块化测试<sup>1</sup></a></li>
+		
+			<li><a href="/tags/随便写写/" title="随便写写">随便写写<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://sinle.me" target="_blank" title="阿乐">阿乐</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>
