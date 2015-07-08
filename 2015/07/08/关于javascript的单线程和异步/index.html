@@ -10,7 +10,7 @@
     <meta name="author" content="阿乐">
     
     <meta name="description" content="线程和异步是什么？其实在js里，是没有线程这个概念的，所谓的单线程也只是相对于多线程而言。于是，针对js这种不具备并行任务处理的特性，我们称之为“单线程”。
-另一方面，异步又是什么东西呢？js的点击等事件回调，ajax回调和setTimeout，这些都是js的异步特性，使用的时候感觉就好像打开了一个">
+另一方面，异步又是什么东西呢？js的点击等事件回调和setTimeout，这些都是js的异步特性，使用的时候感觉就好像打开了一个新的线程去执行">
     
     
     
@@ -74,7 +74,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-07-08T07:54:57.000Z" itemprop="datePublished">2015-07-08</time>
-    更新日期:<time datetime="2015-07-08T10:09:10.000Z" itemprop="dateModified">2015-07-08</time>
+    更新日期:<time datetime="2015-07-08T10:16:25.000Z" itemprop="dateModified">2015-07-08</time>
     
   </p>
 </header>
@@ -87,7 +87,7 @@
 		</div>
 		
 		<h1 id="线程和异步是什么？">线程和异步是什么？</h1><p>其实在js里，是没有线程这个概念的，所谓的单线程也只是相对于多线程而言。于是，针对js这种不具备并行任务处理的特性，我们称之为“单线程”。</p>
-<p>另一方面，异步又是什么东西呢？<br>js的点击等事件回调，ajax回调和setTimeout，这些都是js的异步特性，使用的时候感觉就好像打开了一个新的线程去执行代码。<br>但实际上，这些都是通过队列去完成的。</p>
+<p>另一方面，异步又是什么东西呢？<br>js的点击等事件回调和setTimeout，这些都是js的异步特性，使用的时候感觉就好像打开了一个新的线程去执行代码。<br>但实际上，这些都是通过队列去完成的。</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span><br><span class="line">*	当我们声明一个setTimeout和它的回调的时候。</span><br><span class="line">* 	实际上js解析引擎是把回调放在了执行队列(线程）的最末尾。</span><br><span class="line">*/</span></span><br><span class="line">setTimeout(<span class="function"><span class="keyword">function</span><span class="params">()</span></span>&#123;</span><br><span class="line">	console.log(<span class="string">'Hello World");</span><br><span class="line">&#125;,0);</span></span><br></pre></td></tr></table></figure>
 <h1 id="js是单线程的">js是单线程的</h1><p>怎么证明它是这样子运作的呢？<br>其实很简单，如果说setTimeout回调被放在了队列的末尾，那就意味着，如果队列前面的内容（js代码）没有执行完毕，就不能执行末尾的回调。</p>
 <p>简单的说就是，setTimeout回调在线程空闲之前是不会运行的。</p>
