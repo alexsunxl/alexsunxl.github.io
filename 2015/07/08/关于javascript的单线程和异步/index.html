@@ -1,0 +1,340 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>关于javascript的单线程和异步 | 阿乐的javascript研究所</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="阿乐">
+    
+    <meta name="description" content="线程和异步是什么？其实在js里，是没有线程这个概念的，所谓的单线程也只是相对于多线程而言。于是，针对js这种不具备并行任务处理的特性，我们称之为“单线程”。
+另一方面，异步又是什么东西呢？js的点击等事件回调，ajax回调和setTimeout，这些都是js的异步特性，使用的时候感觉就好像打开了一个">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="阿乐的javascript研究所" title="阿乐的javascript研究所"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="阿乐的javascript研究所">阿乐的javascript研究所</a></h1>
+				<h2 class="blog-motto">专注前端挖坑</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:sinle.me">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/07/08/关于javascript的单线程和异步/" title="关于javascript的单线程和异步" itemprop="url">关于javascript的单线程和异步</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://sinle.me" title="阿乐">阿乐</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-07-08T07:54:57.000Z" itemprop="datePublished">2015-07-08</time>
+    更新日期:<time datetime="2015-07-08T10:09:10.000Z" itemprop="dateModified">2015-07-08</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#线程和异步是什么？"><span class="toc-number">1.</span> <span class="toc-text">线程和异步是什么？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#js是单线程的"><span class="toc-number">2.</span> <span class="toc-text">js是单线程的</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#浏览器是多线程的"><span class="toc-number">3.</span> <span class="toc-text">浏览器是多线程的</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#结语"><span class="toc-number">4.</span> <span class="toc-text">结语</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#参考"><span class="toc-number">5.</span> <span class="toc-text">参考</span></a></li></ol>
+		</div>
+		
+		<h1 id="线程和异步是什么？">线程和异步是什么？</h1><p>其实在js里，是没有线程这个概念的，所谓的单线程也只是相对于多线程而言。于是，针对js这种不具备并行任务处理的特性，我们称之为“单线程”。</p>
+<p>另一方面，异步又是什么东西呢？<br>js的点击等事件回调，ajax回调和setTimeout，这些都是js的异步特性，使用的时候感觉就好像打开了一个新的线程去执行代码。<br>但实际上，这些都是通过队列去完成的。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span><br><span class="line">*	当我们声明一个setTimeout和它的回调的时候。</span><br><span class="line">* 	实际上js解析引擎是把回调放在了执行队列(线程）的最末尾。</span><br><span class="line">*/</span></span><br><span class="line">setTimeout(<span class="function"><span class="keyword">function</span><span class="params">()</span></span>&#123;</span><br><span class="line">	console.log(<span class="string">'Hello World");</span><br><span class="line">&#125;,0);</span></span><br></pre></td></tr></table></figure>
+<h1 id="js是单线程的">js是单线程的</h1><p>怎么证明它是这样子运作的呢？<br>其实很简单，如果说setTimeout回调被放在了队列的末尾，那就意味着，如果队列前面的内容（js代码）没有执行完毕，就不能执行末尾的回调。</p>
+<p>简单的说就是，setTimeout回调在线程空闲之前是不会运行的。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//开始时间</span></span><br><span class="line"><span class="keyword">var</span> start = <span class="keyword">new</span> <span class="built_in">Date</span>;</span><br><span class="line">setTimeout(<span class="function"><span class="keyword">function</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="comment">//setTimeout回调函数真正执行的时间</span></span><br><span class="line">	<span class="keyword">var</span> end = <span class="keyword">new</span> <span class="built_in">Date</span>;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">'响应的时间:'</span>, end - start, <span class="string">'ms'</span>);</span><br><span class="line">	</span><br><span class="line">&#125;, <span class="number">500</span>  <span class="comment">/* 我们给setTimeout设置的延迟，这是我们以为它会执行的时间*/</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//执行循环，直到过了1000ms才中断循环。</span></span><br><span class="line"><span class="comment">//这行代码的作用就是阻塞进程。</span></span><br><span class="line"><span class="keyword">while</span>(<span class="keyword">new</span> <span class="built_in">Date</span> - start &lt; <span class="number">1000</span>)&#123;&#125;;</span><br></pre></td></tr></table></figure>
+<p>如果js真的是多线程的，那么计时函数就会在500毫秒后运行。<br>然后事实上，计时器响应时间不可能会小于1000毫秒（被while的循环阻塞住了），这里可能会因为浏览器有细微的差异。</p>
+<p>下图是我在chrome控制台直接运行代码的结果。<br><img src="http://7xj9do.com1.z0.glb.clouddn.com/blog20150708-01.jpg" alt="证明js单线程"></p>
+<p>结论就是：在某个特定的时刻只有特定的代码能够被执行，并阻塞其它的代码。而浏览器是事件驱动的（Event driven），浏览器中很多行为是异步（Asynchronized）的。这些事件会创建的回调函数并放入执行队列中。javascript引擎是单线程处理它的任务队列。如果同一时间有多个事件（如点击和获得焦点事件）同时触发，这些事件会按照一定顺序被放入队列中，然后一个一个响应。</p>
+<h1 id="浏览器是多线程的">浏览器是多线程的</h1><p>另一方面，运行在浏览器中的js是单线程的，但浏览器并不是单线程的。浏览器中很多异步行为都是由浏览器新开一个线程去完成。javascript引擎线程仅仅只是浏览器多个线程中的一个，它本身是单线程的。浏览器还包括很多其他线程，如界面渲染线程，浏览器事件触发线程，http请求线程等。</p>
+<p>除了上面说的这些浏览器的线程之外，每一个页面的标签，都可以算是一个js线程。js线程之间不能直接通信，也就是说，浏览器打开了a，b两个页面，有两个标签，a不知道b发生了什么事情，反过来b也不知道a。</p>
+<p>当然这里可以使用cookie轮询来实现多个线程的间接通信。这又是另一个话题了。</p>
+<h1 id="结语">结语</h1><p>一旦我们能够接受这种语言的单线程设计，其实就会发现js事件模型既优雅又实用。<br>它意味着我们的代码是不可中断的，也意味着调度的事件会整整齐齐排好队，有条不紊地运行。</p>
+<h1 id="参考">参考</h1><blockquote>
+<p><a href="http://www.zhihu.com/question/31982417" title="Title" target="_blank" rel="external">如何证明JavaScript是单线程的？</a></p>
+</blockquote>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/javascript-线程-异步-事件/">javascript 线程 异步 事件</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://sinle.me/2015/07/08/关于javascript的单线程和异步/" data-title="关于javascript的单线程和异步 | 阿乐的javascript研究所" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/05/31/mocha下的javascript模块化测试/"  title="mocha下的javascript模块化测试">
+ <strong>NEXT:</strong><br/> 
+ <span>mocha下的javascript模块化测试
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comment">
+
+    <h1 class="title">文章评论</h1>
+
+    <!-- 多说评论框 start -->
+    <div class="ds-thread" data-thread-key="2015/07/08/关于javascript的单线程和异步/" data-title="关于javascript的单线程和异步" data-url="http://sinle.me/2015/07/08/关于javascript的单线程和异步/"></div>
+    <!-- 多说评论框 end -->
+
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:"sinle"};
+        (function() {
+            var ds = document.createElement('script');
+            ds.type = 'text/javascript';ds.async = true;
+            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+            ds.charset = 'UTF-8';
+            (document.getElementsByTagName('head')[0] 
+             || document.getElementsByTagName('body')[0]).appendChild(ds);
+        })();
+        </script>
+    <!-- 多说公共JS代码 end -->
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#线程和异步是什么？"><span class="toc-number">1.</span> <span class="toc-text">线程和异步是什么？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#js是单线程的"><span class="toc-number">2.</span> <span class="toc-text">js是单线程的</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#浏览器是多线程的"><span class="toc-number">3.</span> <span class="toc-text">浏览器是多线程的</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#结语"><span class="toc-number">4.</span> <span class="toc-text">结语</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#参考"><span class="toc-number">5.</span> <span class="toc-text">参考</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/javascript-线程-异步-事件/" title="javascript 线程 异步 事件">javascript 线程 异步 事件<sup>1</sup></a></li>
+		
+			<li><a href="/tags/spm3-0-seajs-模块化/" title="spm3.0  seajs  模块化">spm3.0  seajs  模块化<sup>1</sup></a></li>
+		
+			<li><a href="/tags/垂直居中-html-css/" title="垂直居中 html+css">垂直居中 html+css<sup>1</sup></a></li>
+		
+			<li><a href="/tags/模块化测试/" title="模块化测试">模块化测试<sup>1</sup></a></li>
+		
+			<li><a href="/tags/随便写写/" title="随便写写">随便写写<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2015 
+		
+		<a href="http://sinle.me" target="_blank" title="阿乐">阿乐</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>
