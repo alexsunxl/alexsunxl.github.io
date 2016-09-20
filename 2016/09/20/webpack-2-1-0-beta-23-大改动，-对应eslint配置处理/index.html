@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>webpack 2.1.0-beta.23 大改动， 对应eslint配置处理 | 阿乐的javascript研究所</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="webpack," />
+  
+
+  <meta name="description" content="前言一直都是用webpack2的beta版本。其实和1相比，API变化并不大。但是就在昨天，webpack2发布了beta.23从版本号来看，貌似只是个小迭代，但其实是一个breaking change!
+删除 module中的preLoaders 和preLoaders并且限制了module.exports的第一层key, 很多属性变成了unknow property的警告
+更多具体的变化可以查">
+<meta property="og:type" content="article">
+<meta property="og:title" content="webpack 2.1.0-beta.23 大改动， 对应eslint配置处理">
+<meta property="og:url" content="http://sinle.me/2016/09/20/webpack-2-1-0-beta-23-大改动，-对应eslint配置处理/index.html">
+<meta property="og:site_name" content="阿乐的javascript研究所">
+<meta property="og:description" content="前言一直都是用webpack2的beta版本。其实和1相比，API变化并不大。但是就在昨天，webpack2发布了beta.23从版本号来看，貌似只是个小迭代，但其实是一个breaking change!
+删除 module中的preLoaders 和preLoaders并且限制了module.exports的第一层key, 很多属性变成了unknow property的警告
+更多具体的变化可以查">
+<meta property="og:image" content="http://7xj9do.com1.z0.glb.clouddn.com/ln/2016-09-20%2011-35-45%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="webpack 2.1.0-beta.23 大改动， 对应eslint配置处理">
+<meta name="twitter:description" content="前言一直都是用webpack2的beta版本。其实和1相比，API变化并不大。但是就在昨天，webpack2发布了beta.23从版本号来看，貌似只是个小迭代，但其实是一个breaking change!
+删除 module中的preLoaders 和preLoaders并且限制了module.exports的第一层key, 很多属性变成了unknow property的警告
+更多具体的变化可以查">
+
+  
+
+  
+    <link rel="icon" href="http://7xj9do.com1.z0.glb.clouddn.com/iconfont-a.png">
+  
+
+  <link rel="stylesheet" href="/css/styles.css" type="text/css">
+
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?c6cf428d8317d9e7025bbef9ce723f7c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a 
+            class="CIRCLE" 
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a 
+            class="CIRCLE" 
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a 
+            class="CIRCLE" 
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a 
+            class="CIRCLE" 
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a 
+            class="CIRCLE" 
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a 
+            class="CIRCLE" 
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#eslint配置修改"><span class="toc-text">eslint配置修改</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#最后分析一下_eslint-loader的源代码_处理配置的部分"><span class="toc-text">最后分析一下 eslint-loader的源代码 处理配置的部分</span></a></li></ol>
+  </div>
+
+
+<a class="back-top" href="#">
+  <i class="icon-angle-up"></i>
+</a>
+
+
+<div class="content-post CENTER">
+   <article id="post-webpack-2-1-0-beta-23-大改动，-对应eslint配置处理" class="article article-type-post" itemscope itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">webpack 2.1.0-beta.23 大改动， 对应eslint配置处理</h1>
+
+    <div class="article-meta">
+      <span>2016-09-20</span>
+
+      <span> | </span>
+
+      <span class="article-author">阿乐</span>
+
+      <span> | </span>
+
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h2 id="前言">前言</h2><p>一直都是用webpack2的beta版本。其实和1相比，API变化并不大。<br>但是就在昨天，webpack2发布了beta.23<br>从版本号来看，貌似只是个小迭代，但其实是一个breaking change!</p>
+<p>删除 module中的preLoaders 和preLoaders<br>并且限制了module.exports的第一层key, 很多属性变成了unknow property的警告<br><img src="http://7xj9do.com1.z0.glb.clouddn.com/ln/2016-09-20%2011-35-45%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png" alt="unknow"></p>
+<p>更多具体的变化可以查看<a href="https://github.com/webpack/webpack/releases/tag/v2.1.0-beta.23" target="_blank" rel="external">release wiki</a></p>
+<h2 id="eslint配置修改">eslint配置修改</h2><p>既然webpack的api改了，有一些配置就无效甚至弹出警告<br>在我的配置里，主要是eslint</p>
+<p>旧的webpack config （主要列出eslint部分, 方便阅读)</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="built_in">module</span>: &#123;</span><br><span class="line">        preLoaders: [</span><br><span class="line">            &#123;</span><br><span class="line">                test: <span class="regexp">/\.js$/</span>,</span><br><span class="line">                loader: <span class="string">'eslint-loader'</span>,</span><br><span class="line">                exclude: [<span class="regexp">/node_modules/</span>],</span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">        loaders: [</span><br><span class="line">            <span class="comment">//...</span></span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    eslint: &#123;</span><br><span class="line">        configFile: <span class="string">'./.eslintrc.js'</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>主要错误就两处， 废话不多说， 先上修改后的配置</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    <span class="built_in">module</span>: &#123;</span><br><span class="line">        loaders: [</span><br><span class="line">            &#123;</span><br><span class="line">                enforce: <span class="string">'right'</span>,</span><br><span class="line">                test: <span class="regexp">/\.js$/</span>,</span><br><span class="line">                loader: <span class="string">'eslint-loader'</span>,</span><br><span class="line">                query: &#123;</span><br><span class="line">                    configFile: <span class="string">'./.eslintrc.js'</span></span><br><span class="line">                &#125;,</span><br><span class="line">                exclude: [<span class="regexp">/node_modules/</span>]</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="comment">//...</span></span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>用 enforce: ‘right’ 代替preLoaders, 然后configFile写在query里面，效果和 { eslint: {}} 是一样的。<br>这样webpack就不会再报错啦 ;)</p>
+<p>configFile的处理也可以这样<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> webpack = <span class="built_in">require</span>(<span class="string">'webpack'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    plugins: [</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">        <span class="keyword">new</span> webpack.LoaderOptionsPlugin(&#123;</span><br><span class="line">            options: &#123;</span><br><span class="line">                eslint: &#123;</span><br><span class="line">                    <span class="comment">/* your eslint loader config */</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><a href="https://github.com/MoOx/eslint-loader/issues/113" target="_blank" rel="external">参考</a></p>
+<h2 id="最后分析一下_eslint-loader的源代码_处理配置的部分">最后分析一下 eslint-loader的源代码 处理配置的部分</h2><p>eslint-loader index.js</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span><span class="params">(input, map)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> config = assign(</span><br><span class="line">    <span class="comment">// loader defaults</span></span><br><span class="line">    &#123;</span><br><span class="line">      formatter: <span class="built_in">require</span>(<span class="string">"eslint/lib/formatters/stylish"</span>),</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">// user defaults</span></span><br><span class="line">    <span class="keyword">this</span>.options.eslint || &#123;&#125;,</span><br><span class="line">    <span class="comment">// loader query string</span></span><br><span class="line">    loaderUtils.parseQuery(<span class="keyword">this</span>.query)</span><br><span class="line">  )</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中的<br>this.options.eslint  对应的是旧版webpack的{eslint: {}}， 在新版中则需要在webpack.LoaderOptionsPlugin赋值传递参数</p>
+<p>this.query 对应loader中的query: {}</p>
+<p>assign会把这两个对象合并起来， 同时前者会覆盖后者。</p>
+<p>所以这两种写法都可以, 我个人比较喜欢写在query里面，这样在loader里，更清晰一些</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+    </div>
+  </section>
+
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//sinleme.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+</body>
+</html>
